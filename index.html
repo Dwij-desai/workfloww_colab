@@ -1,1 +1,1193 @@
- 
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>WorkFlow | Your Work & Study Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>"
+      type="image/svg+xml"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg-light: #f7f8fc;
+        --bg-dark: #111827;
+        --text-light: #1f2937;
+        --text-dark: #f9fafb;
+        --primary: #6366f1;
+        --primary-light: #818cf8;
+        --secondary: #10b981;
+        --accent: #f59e0b;
+        --font-main: "Inter", sans-serif;
+      }
+      html,
+      body {
+        height: 100%;
+        font-family: var(--font-main);
+        background-color: var(--bg-light);
+        color: var(--text-light);
+      }
+      /* Custom scrollbar for a sleek look */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 6px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+      }
+      .sidebar-item-active {
+        background: linear-gradient(90deg, #e0e7ff, transparent);
+        color: var(--primary);
+        font-weight: 600;
+        border-right: 3px solid var(--primary);
+      }
+      .kanban-column {
+        min-width: 300px;
+        max-width: 320px;
+      }
+      .card-dragging {
+        opacity: 0.5;
+        transform: rotate(3deg);
+      }
+      .status-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .card {
+        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .modal-overlay {
+        background-color: rgba(17, 24, 39, 0.6);
+        backdrop-filter: blur(4px);
+      }
+      .progress-ring-circle {
+        transition: stroke-dashoffset 0.5s ease-in-out;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+      }
+      .folder-item-personal .folder-icon {
+        color: #8b5cf6; /* Violet */
+      }
+      .folder-item-academics .folder-icon {
+        color: #3b82f6; /* Blue */
+      }
+      .subject-item .subject-icon {
+        color: #a5b4fc; /* Indigo lighter */
+      }
+    </style>
+  </head>
+
+  <body class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <aside
+      id="sidebar"
+      class="bg-white w-72 p-4 shadow-lg flex-shrink-0 transition-transform duration-300 ease-in-out -translate-x-full sm:translate-x-0 z-20 flex flex-col"
+    >
+      <div class="flex items-center gap-3 mb-8">
+        <span class="text-3xl">🚀</span>
+        <div>
+          <h1 class="text-xl font-bold text-gray-800">WorkFlow</h1>
+          <p class="text-xs text-gray-500">Your Work & Study Hub</p>
+        </div>
+      </div>
+
+      <nav id="subject-nav" class="space-y-2 mb-4">
+        <a
+          href="#"
+          class="sidebar-item flex items-center py-2.5 px-3 rounded-lg hover:bg-indigo-50 transition-colors duration-200"
+          data-subject="dashboard"
+        >
+          <i class="fas fa-home w-6 text-gray-500"></i>
+          <span class="ml-3">Dashboard</span>
+        </a>
+        <a
+          href="#"
+          class="sidebar-item flex items-center py-2.5 px-3 rounded-lg hover:bg-indigo-50 transition-colors duration-200"
+          data-subject="academics-overview"
+        >
+          <i class="fas fa-graduation-cap w-6 text-gray-500"></i>
+          <span class="ml-3">Pending Academics</span>
+        </a>
+      </nav>
+
+      <div class="flex-grow overflow-y-auto pr-2">
+        <!-- Personal Folder -->
+        <div class="mt-4">
+          <h3
+            class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+          >
+            Personal
+          </h3>
+          <div id="personal-folder-list" class="mt-2 space-y-1">
+            <a
+              href="#"
+              class="sidebar-item folder-item-personal flex items-center py-2.5 px-3 rounded-lg hover:bg-indigo-50 transition-colors duration-200"
+              data-subject="side-hustle"
+            >
+              <i class="fas fa-star w-6 folder-icon"></i>
+              <span class="ml-3">Building Things</span>
+              <span
+                class="ml-auto text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full"
+                data-count-id="side-hustle"
+              ></span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Academics Folder -->
+        <div class="mt-6">
+          <div class="flex items-center justify-between px-3 mb-2">
+            <h3
+              class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            >
+              Academics
+            </h3>
+            <button
+              id="add-subject-btn"
+              class="text-indigo-500 hover:text-indigo-700 text-lg"
+              title="Add new subject"
+            >
+              <i class="fas fa-plus-circle"></i>
+            </button>
+          </div>
+          <div id="subject-list" class="space-y-1"></div>
+        </div>
+      </div>
+
+      <div class="mt-auto border-t pt-4 text-sm text-gray-600">
+        <button
+          id="export-btn"
+          class="w-full flex items-center py-2 px-3 rounded hover:bg-gray-100 transition-colors"
+        >
+          <i class="fas fa-download mr-3 w-5"></i>Export Data
+        </button>
+        <label class="w-full block mt-1">
+          <input
+            id="import-file"
+            type="file"
+            accept="application/json"
+            class="hidden"
+          />
+          <span
+            id="import-btn"
+            class="w-full flex items-center py-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors"
+          >
+            <i class="fas fa-upload mr-3 w-5"></i>Import Data
+          </span>
+        </label>
+      </div>
+    </aside>
+
+    <!-- Mobile overlay -->
+    <div
+      id="mobile-overlay"
+      class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden sm:hidden"
+    ></div>
+
+    <!-- Main -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+      <div class="max-w-7xl mx-auto">
+        <header class="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div class="flex items-center">
+            <button
+              id="mobile-menu-button"
+              class="sm:hidden mr-3 p-2 text-gray-500 hover:bg-gray-200 rounded-lg"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div>
+              <h2 id="page-title" class="text-3xl font-bold text-gray-800">
+                Dashboard
+              </h2>
+              <p id="page-subtitle" class="text-sm text-gray-500">
+                Welcome back! Let's get things done.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <i
+                class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              ></i>
+              <input
+                id="global-search"
+                type="search"
+                placeholder="Search tasks..."
+                class="pl-10 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 w-48"
+              />
+            </div>
+            <button
+              id="quick-add-toggle"
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
+            >
+              <i class="fas fa-plus mr-2"></i>New Task
+            </button>
+          </div>
+        </header>
+
+        <!-- Quick add bar -->
+        <div id="quick-add" class="hidden bg-white rounded-lg p-4 shadow-md mb-6">
+          <form id="quick-add-form" class="flex flex-wrap gap-3 items-center">
+            <input
+              id="quick-title"
+              placeholder="Enter a new task title and press Enter..."
+              class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              required
+            />
+            <input
+              id="quick-due"
+              type="date"
+              class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            />
+            <select
+              id="quick-subject"
+              class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            ></select>
+            <button
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Add
+            </button>
+          </form>
+        </div>
+
+        <section id="content-area"></section>
+      </div>
+    </main>
+
+    <!-- Modals & Toaster -->
+    <div id="modals-container"></div>
+    <div
+      id="snackbar"
+      class="fixed left-1/2 transform -translate-x-1/2 bottom-6 hidden bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg z-50"
+    ></div>
+
+    <!-- Templates -->
+    <template id="subject-item-tpl">
+      <a
+        href="#"
+        class="sidebar-item subject-item flex items-center py-2.5 px-3 rounded-lg hover:bg-indigo-50 transition-colors duration-200"
+        data-subject="__id__"
+      >
+        <i class="fas fa-book w-6 subject-icon"></i>
+        <span class="ml-3">__name__</span>
+        <span
+          class="ml-auto text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full"
+          data-count-id="__id__"
+        ></span>
+      </a>
+    </template>
+
+    <template id="kanban-column-tpl">
+      <div
+        class="kanban-column flex flex-col gap-4 bg-gray-100/50 rounded-xl p-4"
+      >
+        <div class="flex items-center justify-between px-1">
+          <h3 class="font-semibold text-gray-700">
+            __emoji__ __title__
+            <span
+              class="text-sm text-gray-500 font-medium bg-gray-200 rounded-full px-2 py-0.5 ml-2"
+              >__count__</span
+            >
+          </h3>
+        </div>
+        <div
+          class="space-y-3 column-drop-area min-h-[100px] flex-grow"
+          data-status="__status__"
+        ></div>
+      </div>
+    </template>
+
+    <template id="card-tpl">
+      <div
+        class="card bg-white p-4 rounded-lg shadow-sm border-l-4"
+        draggable="true"
+        data-id="__id__"
+        style="border-color: __borderColor__"
+      >
+        <div class="flex items-start justify-between">
+          <h4 class="font-semibold text-gray-800 flex-1 pr-2">__title__</h4>
+          <div class="relative">
+            <button
+              class="card-actions text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div
+              class="actions-popup hidden absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-xl z-10"
+            >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 action-edit"
+                ><i class="fas fa-edit mr-3 text-gray-400 w-4"></i>Edit</a
+              >
+              <div class="border-t my-1"></div>
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 action-set-status"
+                data-set-status="not-started"
+                ><i class="fas fa-circle mr-3 text-red-400 w-4"></i>To Do</a
+              >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 action-set-status"
+                data-set-status="in-progress"
+                ><i class="fas fa-circle mr-3 text-yellow-400 w-4"></i>In
+                Progress</a
+              >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 action-set-status"
+                data-set-status="submitted"
+                ><i class="fas fa-circle mr-3 text-green-400 w-4"></i>Done</a
+              >
+              <div class="border-t my-1"></div>
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 action-delete"
+                ><i class="fas fa-trash mr-3 w-4"></i>Delete</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-3 text-xs">
+          <p class="text-gray-500 __dueColor__">
+            <i class="far fa-calendar-alt mr-1.5"></i>__dueText__
+          </p>
+          <span class="status-badge __statusColor__">__statusLabel__</span>
+        </div>
+      </div>
+    </template>
+
+    <script>
+      // --- App State & Configuration ---
+      const statusConfig = {
+        "not-started": {
+          label: "To Do",
+          color: "bg-red-100 text-red-700",
+          borderColor: "#fca5a5",
+          emoji: "🔴",
+        },
+        "in-progress": {
+          label: "In Progress",
+          color: "bg-yellow-100 text-yellow-800",
+          borderColor: "#fcd34d",
+          emoji: "🟡",
+        },
+        submitted: {
+          label: "Done",
+          color: "bg-green-100 text-green-800",
+          borderColor: "#86efac",
+          emoji: "🟢",
+        },
+      };
+
+      const motivationalQuotes = [
+        "The secret of getting ahead is getting started.",
+        "Believe you can and you're halfway there.",
+        "The only way to do great work is to love what you do.",
+        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        "Don't watch the clock; do what it does. Keep going.",
+      ];
+
+      let appData = { subjects: [], practicals: {}, active: "dashboard" };
+      let lastDeleted = null;
+
+      // --- Utility Functions ---
+      const uid = (prefix = "p") =>
+        `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const save = () =>
+        localStorage.setItem("zenithTracker_v1", JSON.stringify(appData));
+      const escapeHtml = (s) =>
+        s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+
+      function load() {
+        const raw = localStorage.getItem("zenithTracker_v1");
+        if (raw) {
+          try {
+            appData = JSON.parse(raw);
+            if (!appData.practicals["side-hustle"]) {
+              appData.practicals["side-hustle"] = [];
+            }
+          } catch (e) {
+            console.error("Error parsing saved data, resetting.", e);
+            resetData();
+          }
+        } else {
+          resetData();
+        }
+      }
+
+      function resetData() {
+        appData = {
+          subjects: [
+            { id: "aad", name: "AAD" },
+            { id: "dsmr", name: "DSMR" },
+            { id: "ma", name: "M&A" },
+          ],
+          practicals: {
+            "side-hustle": [],
+          },
+          active: "dashboard",
+        };
+        appData.subjects.forEach((s) => (appData.practicals[s.id] = []));
+      }
+
+      function showToast(text, isUndo = false) {
+        const el = document.getElementById("snackbar");
+        el.innerHTML = text;
+        if (isUndo) {
+          const btn = document.createElement("button");
+          btn.className = "ml-4 underline font-semibold";
+          btn.textContent = "Undo";
+          btn.onclick = () => {
+            undoDelete();
+            hideToast();
+          };
+          el.appendChild(btn);
+        }
+        el.classList.remove("hidden");
+        clearTimeout(el._t);
+        el._t = setTimeout(hideToast, isUndo ? 6000 : 3000);
+      }
+
+      function hideToast() {
+        document.getElementById("snackbar").classList.add("hidden");
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "No due date";
+        try {
+          return new Date(dateStr).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+        } catch (e) {
+          return "Invalid Date";
+        }
+      }
+
+      function relativeDueText(datestr) {
+        if (!datestr) return { text: "No due date", color: "text-gray-500" };
+        const d = new Date(datestr);
+        d.setHours(0, 0, 0, 0);
+        const t = new Date();
+        t.setHours(0, 0, 0, 0);
+        const diff = Math.round((d - t) / (1000 * 60 * 60 * 24));
+        if (diff < 0)
+          return {
+            text: `Overdue by ${Math.abs(diff)} day(s)`,
+            color: "text-red-500 font-semibold",
+          };
+        if (diff === 0)
+          return {
+            text: "Due today",
+            color: "text-amber-600 font-semibold",
+          };
+        if (diff === 1) return { text: "Due tomorrow", color: "text-gray-600" };
+        return { text: `Due in ${diff} days`, color: "text-gray-500" };
+      }
+
+      // --- Rendering Engine ---
+      function render() {
+        save();
+        renderSidebar();
+        if (appData.active === "dashboard") {
+          renderDashboard();
+        } else if (appData.active === "academics-overview") {
+          renderAcademicsOverview();
+        } else {
+          renderSubjectPage(appData.active);
+        }
+      }
+
+      function renderSidebar() {
+        const subjectList = document.getElementById("subject-list");
+        subjectList.innerHTML = "";
+        const subjectTpl = document.getElementById("subject-item-tpl")
+          .innerHTML;
+
+        appData.subjects.forEach((s) => {
+          const html = subjectTpl
+            .replaceAll("__id__", s.id)
+            .replace("__name__", s.name);
+          subjectList.insertAdjacentHTML("beforeend", html);
+        });
+
+        document
+          .querySelectorAll("[data-count-id]")
+          .forEach((el) => {
+            const count = (appData.practicals[el.dataset.countId] || [])
+              .length;
+            el.textContent = count;
+            el.classList.toggle("hidden", count === 0);
+          });
+
+        document.querySelectorAll(".sidebar-item").forEach((it) => {
+          it.classList.toggle(
+            "sidebar-item-active",
+            it.dataset.subject === appData.active
+          );
+        });
+
+        const quickSub = document.getElementById("quick-subject");
+        quickSub.innerHTML =
+          '<option value="side-hustle">🌟 Side Hustle</option>';
+        appData.subjects.forEach((s) => {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = `📚 ${s.name}`;
+          quickSub.appendChild(opt);
+        });
+      }
+
+      function renderDashboard() {
+        document.getElementById("page-title").textContent = "Dashboard";
+        document.getElementById("page-subtitle").textContent =
+          "Welcome back! Let's get things done. 💪";
+        const area = document.getElementById("content-area");
+
+        let total = 0,
+          done = 0,
+          overdue = 0;
+        const upcoming = [];
+        const allPracticals = Object.values(appData.practicals).flat();
+
+        allPracticals.forEach((p) => {
+          total++;
+          if (p.status === "submitted") done++;
+          if (
+            p.dueDate &&
+            new Date(p.dueDate) < new Date() &&
+            p.status !== "submitted"
+          )
+            overdue++;
+          if (p.status !== "submitted" && p.dueDate) {
+            upcoming.push(p);
+          }
+        });
+
+        upcoming.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+        const nextTasks = upcoming.slice(0, 5);
+        const progress = total > 0 ? Math.round((done / total) * 100) : 0;
+        const radius = 54;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (progress / 100) * circumference;
+
+        area.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-md flex flex-wrap items-center justify-between gap-6">
+              <div class="flex items-center gap-6">
+                <div class="relative w-32 h-32">
+                  <svg class="w-full h-full" viewBox="0 0 120 120">
+                    <circle class="text-gray-200" stroke-width="12" stroke="currentColor" fill="transparent" r="${radius}" cx="60" cy="60"/>
+                    <circle class="progress-ring-circle text-indigo-500" stroke-width="12" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="60" cy="60" style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${offset};"/>
+                  </svg>
+                  <div class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-700">${progress}%</div>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-800">Your Progress</h3>
+                  <p class="text-gray-500">You've completed ${done} of ${total} tasks. Keep it up!</p>
+                </div>
+              </div>
+              <div class="flex gap-4 text-center">
+                <div><div class="text-2xl font-bold text-gray-800">${total}</div><div class="text-sm text-gray-500">Total</div></div>
+                <div><div class="text-2xl font-bold text-green-500">${done}</div><div class="text-sm text-gray-500">Done</div></div>
+                <div><div class="text-2xl font-bold text-red-500">${overdue}</div><div class="text-sm text-gray-500">Overdue</div></div>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+              <h3 class="font-bold text-xl text-gray-800 mb-4">🗓️ Upcoming Deadlines</h3>
+              ${
+                nextTasks.length > 0
+                  ? `<div class="space-y-3">${nextTasks
+                      .map((p) => {
+                        const subject = findSubjectByPracticalId(p.id);
+                        const { text, color } = relativeDueText(p.dueDate);
+                        return `
+                          <div class="p-3 bg-gray-50 rounded-lg flex items-center justify-between border-l-4 border-indigo-300">
+                            <div>
+                              <div class="font-semibold text-gray-800">${escapeHtml(
+                                p.title
+                              )}</div>
+                              <div class="text-xs text-gray-500">${
+                                subject
+                                  ? `📚 ${subject.name}`
+                                  : "🌟 Side Hustle"
+                              }</div>
+                            </div>
+                            <div class="text-sm text-right ${color}">${text}</div>
+                          </div>`;
+                      })
+                      .join("")}</div>`
+                  : `<p class="text-sm text-gray-500 text-center py-4">No upcoming deadlines. You're all caught up!</p>`
+              }
+            </div>
+          </div>
+          <div class="space-y-6">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-xl shadow-lg text-white">
+              <h3 class="font-bold text-lg mb-2">💡 Food for Thought</h3>
+              <p class="text-indigo-100 text-sm">"${
+                motivationalQuotes[
+                  Math.floor(Math.random() * motivationalQuotes.length)
+                ]
+              }"</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="font-bold text-xl text-gray-800 mb-4">⚡ Quick Actions</h3>
+                <div class="space-y-2">
+                    <button id="focus-overdue" class="w-full text-left py-2 px-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors">
+                        <i class="fas fa-exclamation-triangle w-5 mr-2"></i>Focus on Overdue Tasks
+                    </button>
+                    <button id="view-personal" class="w-full text-left py-2 px-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-star w-5 mr-2 text-gray-500"></i>View Personal Projects
+                    </button>
+                </div>
+            </div>
+          </div>
+        </div>
+      `;
+      }
+
+      function renderAcademicsOverview() {
+        document.getElementById("page-title").textContent = "All Academics";
+        document.getElementById("page-subtitle").textContent =
+          "A combined view of all your pending academic tasks.";
+        const area = document.getElementById("content-area");
+
+        const academicTasks = [];
+        appData.subjects.forEach((subject) => {
+          const tasks = appData.practicals[subject.id] || [];
+          tasks.forEach((task) => {
+            if (task.status !== "submitted") {
+              academicTasks.push({ ...task, subjectName: subject.name });
+            }
+          });
+        });
+
+        academicTasks.sort((a, b) => {
+          if (a.dueDate && b.dueDate)
+            return new Date(a.dueDate) - new Date(b.dueDate);
+          if (a.dueDate) return -1;
+          if (b.dueDate) return 1;
+          return 0;
+        });
+
+        const search = document
+          .getElementById("global-search")
+          .value.trim()
+          .toLowerCase();
+        const filteredItems = academicTasks.filter(
+          (p) => !search || p.title.toLowerCase().includes(search)
+        );
+
+        if (filteredItems.length === 0) {
+          area.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                <h3 class="font-bold text-xl text-gray-800 mb-2">🎉 All Clear!</h3>
+                <p class="text-gray-500">You have no pending tasks across all your academic subjects. Great job!</p>
+            </div>`;
+          return;
+        }
+
+        const cardsHtml = filteredItems
+          .map((p) => {
+            const { text, color } = relativeDueText(p.dueDate);
+            const cardHtml = document
+              .getElementById("card-tpl")
+              .innerHTML.replaceAll("__id__", p.id)
+              .replace("__title__", escapeHtml(p.title))
+              .replace("__dueText__", text)
+              .replace("__dueColor__", color)
+              .replace("__borderColor__", statusConfig[p.status].borderColor)
+              .replace("__statusLabel__", statusConfig[p.status].label)
+              .replace("__statusColor__", statusConfig[p.status].color);
+
+            const cardDom = document.createElement("div");
+            cardDom.innerHTML = cardHtml;
+            const subjectInfo = document.createElement("p");
+            subjectInfo.className = "text-xs text-gray-500 mt-1";
+            subjectInfo.innerHTML = `<i class="fas fa-book mr-1.5"></i> ${escapeHtml(
+              p.subjectName
+            )}`;
+            cardDom
+              .querySelector(".card > div:first-child")
+              .insertAdjacentElement("afterend", subjectInfo);
+
+            return cardDom.innerHTML;
+          })
+          .join("");
+
+        area.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${cardsHtml}</div>`;
+
+        attachCardEventListeners();
+      }
+
+      function renderSubjectPage(subjectId) {
+        const subject =
+          subjectId === "side-hustle"
+            ? { id: "side-hustle", name: "Side Hustle" }
+            : appData.subjects.find((s) => s.id === subjectId);
+
+        if (!subject) {
+          appData.active = "dashboard";
+          render();
+          return;
+        }
+
+        document.getElementById("page-title").textContent = subject.name;
+        document.getElementById("page-subtitle").textContent = `Organize your tasks for ${subject.name}`;
+        const area = document.getElementById("content-area");
+
+        const items = (appData.practicals[subjectId] || []).slice();
+        const search = document
+          .getElementById("global-search")
+          .value.trim()
+          .toLowerCase();
+        const filteredItems = items.filter(
+          (p) => !search || p.title.toLowerCase().includes(search)
+        );
+
+        const columns = ["not-started", "in-progress", "submitted"];
+        const columnHtml = columns
+          .map((col) => {
+            const colItems = filteredItems.filter((i) => i.status === col);
+            return document
+              .getElementById("kanban-column-tpl")
+              .innerHTML.replace("__title__", statusConfig[col].label)
+              .replace("__emoji__", statusConfig[col].emoji)
+              .replace("__status__", col)
+              .replace("__count__", colItems.length);
+          })
+          .join("");
+
+        area.innerHTML = `<div class="flex gap-6 overflow-x-auto pb-4">${columnHtml}</div>`;
+
+        columns.forEach((col) => {
+          const dropArea = area.querySelector(
+            `.column-drop-area[data-status='${col}']`
+          );
+          const colItems = filteredItems.filter((i) => i.status === col);
+
+          if (colItems.length) {
+            colItems.forEach((p) => {
+              const { text, color } = relativeDueText(p.dueDate);
+              const cardHtml = document
+                .getElementById("card-tpl")
+                .innerHTML.replaceAll("__id__", p.id)
+                .replace("__title__", escapeHtml(p.title))
+                .replace("__dueText__", text)
+                .replace("__dueColor__", color)
+                .replace("__borderColor__", statusConfig[p.status].borderColor)
+                .replace("__statusLabel__", statusConfig[p.status].label)
+                .replace("__statusColor__", statusConfig[p.status].color);
+              dropArea.insertAdjacentHTML("beforeend", cardHtml);
+            });
+          } else {
+            dropArea.innerHTML =
+              '<div class="text-sm text-gray-500 text-center py-10 border-2 border-dashed rounded-lg">Drag tasks here</div>';
+          }
+        });
+
+        attachCardEventListeners();
+        attachDragDrop();
+      }
+
+      // --- Event Handlers & Logic ---
+      function findSubjectByPracticalId(pid) {
+        for (const sid of Object.keys(appData.practicals)) {
+          if (appData.practicals[sid].some((x) => x.id === pid)) {
+            if (sid === "side-hustle") return null;
+            return appData.subjects.find((s) => s.id === sid);
+          }
+        }
+        return null;
+      }
+
+      function attachCardEventListeners() {
+        document.querySelectorAll(".card").forEach((el) => {
+          el.addEventListener("dragstart", (e) => {
+            e.currentTarget.classList.add("card-dragging");
+            e.dataTransfer.setData("text/plain", e.currentTarget.dataset.id);
+          });
+          el.addEventListener("dragend", (e) =>
+            e.currentTarget.classList.remove("card-dragging")
+          );
+
+          const actionsBtn = el.querySelector(".card-actions");
+          const popup = el.querySelector(".actions-popup");
+          actionsBtn?.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            document
+              .querySelectorAll(".actions-popup")
+              .forEach((p) => p !== popup && p.classList.add("hidden"));
+            popup.classList.toggle("hidden");
+          });
+
+          el.querySelectorAll(".action-set-status").forEach((a) =>
+            a.addEventListener("click", (e) => {
+              e.preventDefault();
+              setPracticalStatusById(el.dataset.id, a.dataset.setStatus);
+            })
+          );
+          el.querySelector(".action-delete")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            deleteCardById(el.dataset.id);
+          });
+          el.querySelector(".action-edit")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            openEditModal(el.dataset.id);
+          });
+        });
+      }
+
+      function setPracticalStatusById(id, newStatus) {
+        for (const sid in appData.practicals) {
+          const p = appData.practicals[sid].find((x) => x.id === id);
+          if (p) {
+            p.status = newStatus;
+            render();
+            break;
+          }
+        }
+      }
+
+      function deleteCardById(id) {
+        for (const sid in appData.practicals) {
+          const idx = appData.practicals[sid].findIndex((x) => x.id === id);
+          if (idx > -1) {
+            lastDeleted = {
+              subjectId: sid,
+              item: appData.practicals[sid][idx],
+            };
+            appData.practicals[sid].splice(idx, 1);
+            render();
+            showToast("Task deleted.", true);
+            return;
+          }
+        }
+      }
+
+      function undoDelete() {
+        if (lastDeleted) {
+          appData.practicals[lastDeleted.subjectId].push(lastDeleted.item);
+          lastDeleted = null;
+          render();
+          showToast("Task restored!");
+        }
+      }
+
+      function attachDragDrop() {
+        document.querySelectorAll(".column-drop-area").forEach((area) => {
+          area.ondragover = (ev) => {
+            ev.preventDefault();
+            area.classList.add("bg-indigo-100", "rounded-lg");
+          };
+          area.ondragleave = (ev) =>
+            area.classList.remove("bg-indigo-100", "rounded-lg");
+          area.ondrop = (ev) => {
+            ev.preventDefault();
+            area.classList.remove("bg-indigo-100", "rounded-lg");
+            const id = ev.dataTransfer.getData("text/plain");
+            if (id) setPracticalStatusById(id, area.dataset.status);
+          };
+        });
+      }
+
+      // --- Modals ---
+      function createModal(title, innerHtml) {
+        const wrap = document.createElement("div");
+        wrap.className =
+          "modal-overlay fixed inset-0 flex items-center justify-center z-50 p-4";
+        wrap.innerHTML = `<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6"> <div class='flex items-center justify-between mb-4'> <h3 class='text-xl font-bold'>${title}</h3> <button class='modal-close text-gray-400 hover:text-gray-700'><i class='fas fa-times'></i></button></div><div>${innerHtml}</div></div>`;
+        document.getElementById("modals-container").appendChild(wrap);
+        wrap
+          .querySelector(".modal-close")
+          .addEventListener("click", () => wrap.remove());
+        wrap.addEventListener("click", (e) => {
+          if (e.target === wrap) wrap.remove();
+        });
+        return wrap;
+      }
+
+      function openAddSubjectModal() {
+        const modal = createModal(
+          "📚 Add New Subject",
+          `<form id='add-subj' class='space-y-4'>
+            <div>
+              <label for='s-name' class='block text-sm font-medium text-gray-700 mb-1'>Subject Name</label>
+              <input id='s-name' placeholder='e.g., Computer Networks' class='w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300' required/>
+            </div>
+            <div class='flex justify-end gap-2 pt-2'>
+              <button type='button' class='modal-cancel px-4 py-2 border rounded-lg hover:bg-gray-100'>Cancel</button>
+              <button class='px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700'>Add Subject</button>
+            </div>
+          </form>`
+        );
+        modal
+          .querySelector(".modal-cancel")
+          .addEventListener("click", () => modal.remove());
+        modal.querySelector("form").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const name = modal.querySelector("#s-name").value.trim();
+          if (!name) return;
+          const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "") + uid("s");
+          appData.subjects.push({ id, name });
+          appData.practicals[id] = [];
+          modal.remove();
+          render();
+        });
+      }
+
+      function openEditModal(practicalId) {
+        let subjectId = null,
+          item = null;
+        for (const sid in appData.practicals) {
+          const found = appData.practicals[sid].find(
+            (x) => x.id === practicalId
+          );
+          if (found) {
+            subjectId = sid;
+            item = found;
+            break;
+          }
+        }
+        if (!item) return;
+
+        const modal = createModal(
+          "✏️ Edit Task",
+          `<form class='space-y-4'>
+            <div><label class='block text-sm font-medium text-gray-700 mb-1'>Title</label><input id='e-title' class='w-full px-3 py-2 border rounded-lg' required /></div>
+            <div><label class='block text-sm font-medium text-gray-700 mb-1'>Due Date</label><input id='e-due' type='date' class='w-full px-3 py-2 border rounded-lg' /></div>
+            <div class='flex gap-4'>
+              <div class='flex-1'><label class='block text-sm font-medium text-gray-700 mb-1'>Folder</label><select id='e-subject' class='w-full px-3 py-2 border rounded-lg'></select></div>
+              <div><label class='block text-sm font-medium text-gray-700 mb-1'>Status</label><select id='e-status' class='w-full px-3 py-2 border rounded-lg'></select></div>
+            </div>
+            <div class='flex justify-end gap-2 pt-2'><button type='button' class='modal-cancel px-4 py-2 border rounded-lg'>Cancel</button><button class='px-4 py-2 bg-indigo-600 text-white rounded-lg'>Save Changes</button></div>
+          </form>`
+        );
+
+        const subjSelect = modal.querySelector("#e-subject");
+        subjSelect.innerHTML =
+          '<option value="side-hustle">🌟 Side Hustle</option>';
+        appData.subjects.forEach((s) => {
+          subjSelect.innerHTML += `<option value='${s.id}'>📚 ${s.name}</option>`;
+        });
+
+        const statusSelect = modal.querySelector("#e-status");
+        Object.keys(statusConfig).forEach((key) => {
+          statusSelect.innerHTML += `<option value='${key}'>${statusConfig[key].label}</option>`;
+        });
+
+        modal.querySelector("#e-title").value = item.title;
+        modal.querySelector("#e-due").value = item.dueDate || "";
+        subjSelect.value = subjectId;
+        statusSelect.value = item.status;
+
+        modal
+          .querySelector(".modal-cancel")
+          .addEventListener("click", () => modal.remove());
+        modal.querySelector("form").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const newTitle = modal.querySelector("#e-title").value.trim();
+          if (!newTitle) return;
+
+          const newSub = modal.querySelector("#e-subject").value;
+          if (newSub !== subjectId) {
+            const idx = appData.practicals[subjectId].findIndex(
+              (x) => x.id === item.id
+            );
+            if (idx > -1) appData.practicals[subjectId].splice(idx, 1);
+            appData.practicals[newSub].push(item);
+          }
+          item.title = newTitle;
+          item.dueDate = modal.querySelector("#e-due").value || null;
+          item.status = modal.querySelector("#e-status").value;
+          modal.remove();
+          render();
+        });
+      }
+
+      // --- Import/Export ---
+      function exportJSON() {
+        const blob = new Blob([JSON.stringify(appData, null, 2)], {
+          type: "application/json",
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "zenith-data.json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      function importJSON(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if (!parsed.subjects || !parsed.practicals)
+              throw new Error("Invalid format");
+            appData = parsed;
+            render();
+            showToast("Import successful!");
+          } catch (err) {
+            alert("Error: Invalid file format.");
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      // --- Initial Setup & Event Listeners ---
+      document.addEventListener("DOMContentLoaded", () => {
+        load();
+        render();
+
+        // Sidebar navigation
+        document.body.addEventListener("click", (e) => {
+          const sidebarItem = e.target.closest(".sidebar-item");
+          if (sidebarItem) {
+            e.preventDefault();
+            appData.active = sidebarItem.dataset.subject;
+            render();
+            if (window.innerWidth < 640) {
+              document
+                .getElementById("sidebar")
+                .classList.add("-translate-x-full");
+              document.getElementById("mobile-overlay").classList.add("hidden");
+            }
+          }
+        });
+
+        // Mobile menu
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("mobile-overlay");
+        document
+          .getElementById("mobile-menu-button")
+          .addEventListener("click", () => {
+            sidebar.classList.toggle("-translate-x-full");
+            overlay.classList.toggle("hidden");
+          });
+        overlay.addEventListener("click", () => {
+          sidebar.classList.add("-translate-x-full");
+          overlay.classList.add("hidden");
+        });
+
+        // Add subject
+        document
+          .getElementById("add-subject-btn")
+          .addEventListener("click", openAddSubjectModal);
+
+        // Quick add
+        document
+          .getElementById("quick-add-toggle")
+          .addEventListener("click", () => {
+            document.getElementById("quick-add").classList.toggle("hidden");
+            document.getElementById("quick-title").focus();
+          });
+        document
+          .getElementById("quick-add-form")
+          .addEventListener("submit", (e) => {
+            e.preventDefault();
+            const title = document.getElementById("quick-title").value.trim();
+            const subjectId = document.getElementById("quick-subject").value;
+            if (!title || !subjectId) return;
+            appData.practicals[subjectId].push({
+              id: uid(),
+              title,
+              dueDate: document.getElementById("quick-due").value || null,
+              status: "not-started",
+              createdAt: Date.now(),
+            });
+            e.target.reset();
+            render();
+          });
+
+        // Search
+        document
+          .getElementById("global-search")
+          .addEventListener("input", () => render());
+
+        // Import/Export
+        document
+          .getElementById("export-btn")
+          .addEventListener("click", exportJSON);
+        document
+          .getElementById("import-btn")
+          .addEventListener("click", () =>
+            document.getElementById("import-file").click()
+          );
+        document
+          .getElementById("import-file")
+          .addEventListener("change", (e) => {
+            if (e.target.files.length) importJSON(e.target.files[0]);
+          });
+
+        // Dashboard Actions
+        document.body.addEventListener("click", (e) => {
+          if (e.target.closest("#focus-overdue")) {
+            showToast("Feature coming soon: A dedicated 'Overdue' focus mode!");
+          }
+          if (e.target.closest("#view-personal")) {
+            appData.active = "side-hustle";
+            render();
+          }
+        });
+
+        // Global click listener to close popups
+        document.addEventListener("click", (e) => {
+          if (
+            !e.target.closest(".actions-popup") &&
+            !e.target.closest(".card-actions")
+          ) {
+            document
+              .querySelectorAll(".actions-popup")
+              .forEach((p) => p.classList.add("hidden"));
+          }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            document
+              .querySelectorAll(".modal-overlay")
+              .forEach((m) => m.remove());
+            document  
+              .querySelectorAll(".actions-popup")
+              .forEach((p) => p.classList.add("hidden"));
+          }
+        });
+      });
+    </script>
+  </body>
+<!-- Author: Jatin Patel-->
+<!-- Date: 27 September 2025 -->
+<!-- Purpose: Academics Submission Tracker -->
+</html> 
